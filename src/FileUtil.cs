@@ -24,7 +24,7 @@ public class FileUtilSync : IFileUtilSync
 
     public string ReadFile(string path)
     {
-        _logger.LogDebug("{name} start for {path}", nameof(File.ReadAllText), path);
+        _logger.LogDebug("{name} start for {path} ...", nameof(File.ReadAllText), path);
 
         string result = File.ReadAllText(path);
         return result;
@@ -32,7 +32,7 @@ public class FileUtilSync : IFileUtilSync
 
     public byte[] ReadFileToBytes(string path)
     {
-        _logger.LogDebug("{name} start for {path}", nameof(File.ReadAllBytes), path);
+        _logger.LogDebug("{name} start for {path} ...", nameof(File.ReadAllBytes), path);
 
         byte[] result = File.ReadAllBytes(path);
 
@@ -57,7 +57,7 @@ public class FileUtilSync : IFileUtilSync
 
     public void WriteFile(string path, string content)
     {
-        _logger.LogDebug("WriteAllTextAsync start for {name}", path);
+        _logger.LogDebug("{name} start for {name} ...", nameof(File.WriteAllText), path);
 
         File.WriteAllText(path, content);
     }
@@ -74,7 +74,7 @@ public class FileUtilSync : IFileUtilSync
 
     public void WriteFile(string path, byte[] byteArray)
     {
-        _logger.LogDebug("Starting {name} to {name} ...", nameof(File.WriteAllBytes), path);
+        _logger.LogDebug("{name} start for {name} ...", nameof(File.WriteAllBytes), path);
 
         File.WriteAllBytes(path, byteArray);
     }
@@ -130,7 +130,7 @@ public class FileUtilSync : IFileUtilSync
 
     public void Move(string source, string target)
     {
-        _logger.LogDebug("Moving {source} to {target}", source, target);
+        _logger.LogDebug("Moving {source} to {target} ...", source, target);
 
         File.Move(source, target);
 
@@ -139,7 +139,7 @@ public class FileUtilSync : IFileUtilSync
 
     public void Copy(string source, string target)
     {
-        _logger.LogDebug("Copying {source} to {target}", source, target);
+        _logger.LogDebug("Copying {source} to {target} ...", source, target);
 
         File.Copy(source, target);
 
