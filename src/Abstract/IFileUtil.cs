@@ -57,4 +57,16 @@ public interface IFileUtilSync
 
     [Pure]
     long GetFileSize(string path);
+
+    [Pure]
+    List<string> GetAllFileNamesInDirectoryRecursively(string directory);
+
+    void RenameAllFilesInDirectoryRecursively(string sourceDirectory, string oldValue, string newValue);
+
+    [Pure]
+    List<FileInfo> GetAllFileInfoInDirectoryRecursivelySafe(string directory);
+
+    void DeleteAllFilesSafe(string directory);
+
+    void CopyFilesRecursively(string sourceDir, string destinationDir, bool overwrite = true);
 }

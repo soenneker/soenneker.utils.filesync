@@ -112,6 +112,20 @@ public class FileUtilSync : IFileUtilSync
         return true;
     }
 
+    public void DeleteAllFilesSafe(string directory)
+    {
+        _logger.LogInformation("Deleting all files in {directory} ...", directory);
+
+        List<FileInfo> files = GetAllFileInfoInDirectoryRecursivelySafe(directory);
+
+        foreach (FileInfo file in files)
+        {
+            Delete(file.FullName);
+        }
+
+        _logger.LogDebug("Completed deleting all files from {directory}", directory);
+    }
+
     public bool TryDelete(string filename)
     {
         _logger.LogDebug("Trying to delete {filename} ...", filename);
@@ -130,6 +144,12 @@ public class FileUtilSync : IFileUtilSync
 
     public void Move(string source, string target)
     {
+        if (source == target)
+        {
+            _logger.LogWarning("Not moving file ({source}) because source = target", source);
+            return;
+        }
+
         _logger.LogDebug("Moving {source} to {target} ...", source, target);
 
         File.Move(source, target);
@@ -163,8 +183,112 @@ public class FileUtilSync : IFileUtilSync
         }
     }
 
+    public void CopyFilesRecursively(string sourceDir, string destinationDir, bool overwrite = true)
+    {
+        // Copy the directory structure
+        var allDirectories = Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories);
+        foreach (var dir in allDirectories)
+        {
+            var dirToCreate = dir.Replace(sourceDir, destinationDir);
+            Directory.CreateDirectory(dirToCreate);
+        }
+
+        var allFiles = GetAllFileNamesInDirectoryRecursively(sourceDir);
+
+        foreach (var newPath in allFiles)
+        {
+            File.Copy(newPath, newPath.Replace(sourceDir, destinationDir), overwrite);
+        }
+    }
+
     public long GetFileSize(string path)
     {
         return new FileInfo(path).Length;
+    }
+
+    public List<string> GetAllFileNamesInDirectoryRecursively(string directory)
+    {
+        _logger.LogDebug("Getting all files from directory ({directory}) recursively...", directory);
+
+        var result = Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories).ToList();
+
+        return result;
+    }
+
+    public List<FileInfo> GetAllFileInfoInDirectoryRecursivelySafe(string directory)
+    {
+        _logger.LogDebug("Getting all FileInfos in {directory} recursively...", directory);
+
+        var list = new List<FileInfo>();
+
+        try
+        {
+            var diTop = new DirectoryInfo(directory);
+
+            // Get all files in top level
+            foreach (FileInfo fi in diTop.EnumerateFiles())
+            {
+                try
+                {
+                    var fileInfo = new FileInfo(fi.FullName);
+                    list.Add(fileInfo);
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    _logger.LogWarning("Unauthorized Exception for {fullName}", fi.FullName);
+                }
+            }
+
+            // Get each subdirectory, and then enumerate over those
+            foreach (DirectoryInfo? di in diTop.EnumerateDirectories("*"))
+            {
+                try
+                {
+                    foreach (FileInfo? fi in di.EnumerateFiles("*", SearchOption.AllDirectories))
+                    {
+                        try
+                        {
+                            var fileInfo = new FileInfo(fi.FullName);
+                            list.Add(fileInfo);
+                        }
+                        catch (UnauthorizedAccessException)
+                        {
+                            _logger.LogWarning("Unauthorized Exception for {fullName}", fi.FullName);
+                        }
+                    }
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    _logger.LogWarning("Unauthorized Exception for {fullName}", di.FullName);
+                }
+            }
+        }
+        catch (DirectoryNotFoundException dirNotFound)
+        {
+            _logger.LogWarning("DirectoryNotFoundException {message}", dirNotFound.Message);
+        }
+        catch (UnauthorizedAccessException unAuthDir)
+        {
+            _logger.LogWarning("UnauthorizedAccessException: {message}", unAuthDir.Message);
+        }
+        catch (PathTooLongException longPath)
+        {
+            _logger.LogWarning("PathTooLongException {message}", longPath.Message);
+        }
+
+        _logger.LogDebug("Completed getting all files in {dir}, number: {number}", directory, list.Count);
+
+        return list;
+    }
+
+    public void RenameAllFilesInDirectoryRecursively(string sourceDirectory, string oldValue, string newValue)
+    {
+        var allFiles = GetAllFileNamesInDirectoryRecursively(sourceDirectory);
+
+        foreach (var file in allFiles)
+        {
+            var newFileName = file.Replace(oldValue, newValue);
+            Move(file, newFileName);
+        }
     }
 }
