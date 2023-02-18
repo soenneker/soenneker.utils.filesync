@@ -3,7 +3,7 @@ using Soenneker.Utils.FileSync.Abstract;
 
 namespace Soenneker.Utils.FileSync.Extensions;
 
-public static class MemoryStreamUtilRegistrar
+public static class FileUtilSyncRegistrar
 {
     /// <summary>
     /// Adds IFileUtilSync as a scoped service. <para/>
