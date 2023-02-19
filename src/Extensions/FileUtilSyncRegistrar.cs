@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Soenneker.Utils.FileSync.Abstract;
 
 namespace Soenneker.Utils.FileSync.Extensions;
@@ -12,6 +13,6 @@ public static class FileUtilSyncRegistrar
     /// </summary>
     public static void AddFileUtilSync(this IServiceCollection services)
     {
-        services.AddScoped<IFileUtilSync, FileUtilSync>();
+        services.TryAddScoped<IFileUtilSync, FileUtilSync>();
     }
 }
