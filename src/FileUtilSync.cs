@@ -112,7 +112,21 @@ public class FileUtilSync : IFileUtilSync
         return true;
     }
 
-    public void DeleteAllFilesSafe(string directory)
+    public void TryDeleteAllFiles(string directory)
+    {
+        _logger.LogInformation("Deleting all files in {dir}", directory);
+
+        List<FileInfo> files = GetAllFileInfoInDirectoryRecursivelySafe(directory);
+
+        foreach (FileInfo file in files)
+        {
+            TryDelete(file.FullName);
+        }
+
+        _logger.LogTrace("Completed deleting all files");
+    }
+
+    public void DeleteAllFiles(string directory)
     {
         _logger.LogInformation("Deleting all files in {directory} ...", directory);
 

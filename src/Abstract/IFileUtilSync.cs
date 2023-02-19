@@ -66,7 +66,9 @@ public interface IFileUtilSync
     [Pure]
     List<FileInfo> GetAllFileInfoInDirectoryRecursivelySafe(string directory);
 
-    void DeleteAllFilesSafe(string directory);
+    void TryDeleteAllFiles(string directory);
+
+    void DeleteAllFiles(string directory);
 
     void CopyFilesRecursively(string sourceDir, string destinationDir, bool overwrite = true);
 }
