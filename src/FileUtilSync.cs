@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Soenneker.Extensions.Stream;
 using Soenneker.Utils.FileSync.Abstract;
 
 namespace Soenneker.Utils.FileSync;
@@ -64,7 +65,7 @@ public class FileUtilSync : IFileUtilSync
 
     public void WriteFile(string path, Stream stream)
     {
-        stream.Seek(0, SeekOrigin.Begin);
+        stream.ToStart();
 
         using (var fs = new FileStream(path, FileMode.OpenOrCreate))
         {

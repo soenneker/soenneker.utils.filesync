@@ -15,4 +15,14 @@ public static class FileUtilSyncRegistrar
     {
         services.TryAddScoped<IFileUtilSync, FileUtilSync>();
     }
+
+    /// <summary>
+    /// Adds IFileUtilSync as a singleton service. <para/>
+    /// Shorthand for <code>services.AddSingleton</code> <para/>
+    /// Does NOT need to be registered if you're also using IFileUtil.
+    /// </summary>
+    public static void AddFileUtilSyncAsSingleton(this IServiceCollection services)
+    {
+        services.TryAddSingleton<IFileUtilSync, FileUtilSync>();
+    }
 }
