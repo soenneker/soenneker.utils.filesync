@@ -201,16 +201,16 @@ public class FileUtilSync : IFileUtilSync
     public void CopyFilesRecursively(string sourceDir, string destinationDir, bool overwrite = true)
     {
         // Copy the directory structure
-        var allDirectories = Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories);
-        foreach (var dir in allDirectories)
+        string[] allDirectories = Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories);
+        foreach (string dir in allDirectories)
         {
-            var dirToCreate = dir.Replace(sourceDir, destinationDir);
+            string dirToCreate = dir.Replace(sourceDir, destinationDir);
             Directory.CreateDirectory(dirToCreate);
         }
 
-        var allFiles = GetAllFileNamesInDirectoryRecursively(sourceDir);
+        List<string> allFiles = GetAllFileNamesInDirectoryRecursively(sourceDir);
 
-        foreach (var newPath in allFiles)
+        foreach (string newPath in allFiles)
         {
             File.Copy(newPath, newPath.Replace(sourceDir, destinationDir), overwrite);
         }
@@ -225,7 +225,7 @@ public class FileUtilSync : IFileUtilSync
     {
         _logger.LogDebug("Getting all files from directory ({directory}) recursively...", directory);
 
-        var result = Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories).ToList();
+        List<string> result = Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories).ToList();
 
         return result;
     }
@@ -298,11 +298,11 @@ public class FileUtilSync : IFileUtilSync
 
     public void RenameAllFilesInDirectoryRecursively(string sourceDirectory, string oldValue, string newValue)
     {
-        var allFiles = GetAllFileNamesInDirectoryRecursively(sourceDirectory);
+        List<string> allFiles = GetAllFileNamesInDirectoryRecursively(sourceDirectory);
 
-        foreach (var file in allFiles)
+        foreach (string file in allFiles)
         {
-            var newFileName = file.Replace(oldValue, newValue);
+            string newFileName = file.Replace(oldValue, newValue);
             Move(file, newFileName);
         }
     }
