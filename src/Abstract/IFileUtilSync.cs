@@ -71,4 +71,8 @@ public interface IFileUtilSync
     void DeleteAllFiles(string directory);
 
     void CopyFilesRecursively(string sourceDir, string destinationDir, bool overwrite = true);
+
+    bool TryRemoveReadonlyAndArchiveAttribute(string fileName);
+
+    void TryRemoveReadonlyAndArchiveAttributesFromAllFiles(string directory);
 }

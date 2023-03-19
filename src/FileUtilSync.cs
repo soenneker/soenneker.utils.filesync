@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Soenneker.Extensions.FileInfo;
 using Soenneker.Extensions.Stream;
 using Soenneker.Utils.FileSync.Abstract;
 
@@ -82,7 +83,7 @@ public class FileUtilSync : IFileUtilSync
 
     public bool Exists(string filename)
     {
-        _logger.LogDebug("Checking if file exists: {filename}...", filename);
+        _logger.LogDebug("Checking if file exists: {filename} ...", filename);
 
         if (!File.Exists(filename))
         {
@@ -113,9 +114,46 @@ public class FileUtilSync : IFileUtilSync
         return true;
     }
 
+    public void TryRemoveReadonlyAndArchiveAttributesFromAllFiles(string directory)
+    {
+        _logger.LogInformation("Trying to remove readonly/archive in {dir} ...", directory);
+
+        List<FileInfo> files = GetAllFileInfoInDirectoryRecursivelySafe(directory);
+
+        foreach (FileInfo file in files)
+        {
+            try
+            {
+                file.RemoveReadOnlyOrArchivedAttribute();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Could not remove attributes from file ({file}), skipping", file.FullName);
+            }
+        }
+
+        _logger.LogTrace("Completed trying to remove readonly and archive from all files");
+    }
+
+    public bool TryRemoveReadonlyAndArchiveAttribute(string fileName)
+    {
+        try
+        {
+            var fileInfo = new FileInfo(fileName);
+            fileInfo.RemoveReadOnlyOrArchivedAttribute();
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Could not remove attributes from file ({file}), skipping", fileName);
+        }
+
+        return false;
+    }
+
     public void TryDeleteAllFiles(string directory)
     {
-        _logger.LogInformation("Deleting all files in {dir}", directory);
+        _logger.LogInformation("Deleting all files in {dir} ...", directory);
 
         List<FileInfo> files = GetAllFileInfoInDirectoryRecursivelySafe(directory);
 
