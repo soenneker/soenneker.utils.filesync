@@ -38,8 +38,8 @@
         <None Include="..\icon.png" Pack="true" PackagePath="\" />
 
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-        <PackageReference Include="Soenneker.Extensions.FileInfo" Version="1.0.10" />
-        <PackageReference Include="Soenneker.Extensions.Stream" Version="1.0.2" />
+        <PackageReference Include="Soenneker.Extensions.FileInfo" Version="1.0.11" />
+        <PackageReference Include="Soenneker.Extensions.Stream" Version="1.0.3" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
