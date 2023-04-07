@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -19,7 +20,14 @@ public class FileUtilSync : IFileUtilSync
         _logger = logger;
     }
 
-    public string GetTempFileName()
+    /// <summary>
+    /// Use this instead of Systems.IO.Path.GetTempFileName()!  <para/>
+    /// 1. It creates 0 byte file (so it'll already exist)  <para/>
+    /// 2. It's slow because it iterates over the file system to (hopefully) find a non-collision <para/>
+    /// https://stackoverflow.com/a/50413126
+    /// </summary>
+    [Pure]
+    public static string GetTempFileName()
     {
         return Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
     }
@@ -254,7 +262,8 @@ public class FileUtilSync : IFileUtilSync
         }
     }
 
-    public long GetFileSize(string path)
+    [Pure]
+    public static long GetFileSize(string path)
     {
         return new FileInfo(path).Length;
     }

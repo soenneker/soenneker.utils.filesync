@@ -10,15 +10,6 @@ namespace Soenneker.Utils.FileSync.Abstract;
 /// </summary>
 public interface IFileUtilSync
 {
-    /// <summary>
-    /// Use this instead of Systems.IO.Path.GetTempFileName()!  <para/>
-    /// 1. It creates 0 byte file (so it'll already exist)  <para/>
-    /// 2. It's slow because it iterates over the file system to (hopefully) find a non-collision <para/>
-    /// https://stackoverflow.com/a/50413126
-    /// </summary>
-    [Pure]
-    string GetTempFileName();
-
     [Pure]
     string ReadFile(string path);
 
@@ -54,9 +45,6 @@ public interface IFileUtilSync
     void Copy(string source, string target);
 
     bool TryCopy(string source, string target);
-
-    [Pure]
-    long GetFileSize(string path);
 
     [Pure]
     List<string> GetAllFileNamesInDirectoryRecursively(string directory);
