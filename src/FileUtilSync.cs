@@ -29,7 +29,8 @@ public class FileUtilSync : IFileUtilSync
     [Pure]
     public static string GetTempFileName()
     {
-        return Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        var result = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        return result;
     }
 
     public string ReadFile(string path)

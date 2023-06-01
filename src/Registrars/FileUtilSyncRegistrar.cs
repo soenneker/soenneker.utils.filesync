@@ -2,8 +2,11 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Soenneker.Utils.FileSync.Abstract;
 
-namespace Soenneker.Utils.FileSync.Extensions;
+namespace Soenneker.Utils.FileSync.Registrars;
 
+/// <summary>
+/// A utility library encapsulating synchronous file IO operations
+/// </summary>
 public static class FileUtilSyncRegistrar
 {
     /// <summary>
