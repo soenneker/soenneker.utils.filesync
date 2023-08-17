@@ -40,7 +40,7 @@
 
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
         <PackageReference Include="Soenneker.Extensions.FileInfo" Version="1.0.48" />
-        <PackageReference Include="Soenneker.Extensions.Stream" Version="1.0.29" />
+        <PackageReference Include="Soenneker.Extensions.Stream" Version="1.0.30" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
     </ItemGroup>
 </Project>
