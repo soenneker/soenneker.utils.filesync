@@ -39,7 +39,7 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
 
         
-        <PackageReference Include="Soenneker.Extensions.FileInfo" Version="2.1.6" />
+        <PackageReference Include="Soenneker.Extensions.FileInfo" Version="2.1.11" />
         <PackageReference Include="Soenneker.Extensions.Stream" Version="2.1.4" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
     </ItemGroup>
