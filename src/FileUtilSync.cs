@@ -115,10 +115,22 @@ public class FileUtilSync : IFileUtilSync
     {
         _logger.LogDebug("Deleting file if it exists: {filename} ...", filename);
 
-        if (Exists(filename))
+        if (!Exists(filename))
             return false;
 
         Delete(filename);
+
+        return true;
+    }
+
+    public bool TryDeleteIfExists(string filename)
+    {
+        _logger.LogDebug("Trying to delete file if it exists: {filename} ...", filename);
+
+        if (!Exists(filename))
+            return false;
+
+        TryDelete(filename);
 
         return true;
     }

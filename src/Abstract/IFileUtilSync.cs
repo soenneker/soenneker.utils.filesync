@@ -38,6 +38,8 @@ public interface IFileUtilSync
 
     bool DeleteIfExists(string filename);
 
+    bool TryDeleteIfExists(string filename);
+
     bool TryDelete(string filename);
 
     void Move(string source, string target);
