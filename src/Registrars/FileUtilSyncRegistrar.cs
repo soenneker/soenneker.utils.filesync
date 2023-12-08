@@ -15,7 +15,7 @@ public static class FileUtilSyncRegistrar
     /// Shorthand for <code>services.AddScoped</code> <para/>
     /// Does NOT need to be registered if you're also using IFileUtil.
     /// </summary>
-    public static void AddFileUtilSync(this IServiceCollection services)
+    public static void AddFileUtilSyncAsScoped(this IServiceCollection services)
     {
         services.TryAddScoped<IFileUtilSync, FileUtilSync>();
         services.AddDirectoryUtilAsScoped();
