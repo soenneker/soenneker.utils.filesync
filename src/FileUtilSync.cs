@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Soenneker.Extensions.FileInfo;
 using Soenneker.Extensions.Stream;
+using Soenneker.Utils.Directory.Abstract;
 using Soenneker.Utils.FileSync.Abstract;
 
 namespace Soenneker.Utils.FileSync;
@@ -14,10 +15,12 @@ namespace Soenneker.Utils.FileSync;
 public class FileUtilSync : IFileUtilSync
 {
     private readonly ILogger<FileUtilSync> _logger;
+    private readonly IDirectoryUtil _directoryUtil;
 
-    public FileUtilSync(ILogger<FileUtilSync> logger)
+    public FileUtilSync(ILogger<FileUtilSync> logger, IDirectoryUtil directoryUtil)
     {
         _logger = logger;
+        _directoryUtil = directoryUtil;
     }
 
     /// <summary>
@@ -260,11 +263,11 @@ public class FileUtilSync : IFileUtilSync
     public void CopyFilesRecursively(string sourceDir, string destinationDir, bool overwrite = true)
     {
         // Copy the directory structure
-        string[] allDirectories = Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories);
+        string[] allDirectories = System.IO.Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories);
         foreach (string dir in allDirectories)
         {
             string dirToCreate = dir.Replace(sourceDir, destinationDir);
-            Directory.CreateDirectory(dirToCreate);
+            System.IO.Directory.CreateDirectory(dirToCreate);
         }
 
         List<string> allFiles = GetAllFileNamesInDirectoryRecursively(sourceDir);
@@ -272,6 +275,25 @@ public class FileUtilSync : IFileUtilSync
         foreach (string newPath in allFiles)
         {
             File.Copy(newPath, newPath.Replace(sourceDir, destinationDir), overwrite);
+        }
+    }
+
+    public void CopyFiles(string sourceDirectory, string destinationDirectory, bool overwrite = true)
+    {
+        if (!System.IO.Directory.Exists(sourceDirectory))
+            throw new Exception($"Source directory ({sourceDirectory}) does not exist");
+
+        _ = _directoryUtil.CreateIfDoesNotExist(destinationDirectory);
+
+        string[] files = System.IO.Directory.GetFiles(sourceDirectory);
+
+        foreach (string filePath in files)
+        {
+            string fileName = Path.GetFileName(filePath);
+
+            string destinationPath = Path.Combine(destinationDirectory, fileName);
+
+            File.Copy(filePath, destinationPath, overwrite);
         }
     }
 
@@ -285,7 +307,7 @@ public class FileUtilSync : IFileUtilSync
     {
         _logger.LogDebug("Getting all files from directory ({directory}) recursively...", directory);
 
-        List<string> result = Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories).ToList();
+        List<string> result = System.IO.Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories).ToList();
 
         return result;
     }

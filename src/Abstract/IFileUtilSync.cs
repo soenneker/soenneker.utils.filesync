@@ -46,6 +46,8 @@ public interface IFileUtilSync
 
     void Copy(string source, string target);
 
+    void CopyFiles(string sourceDirectory, string destinationDirectory, bool overwrite = true);
+
     bool TryCopy(string source, string target);
 
     [Pure]

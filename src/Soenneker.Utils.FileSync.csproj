@@ -13,7 +13,7 @@
         <Version Condition="'$(BUILD_VERSION)' != ''">$(BUILD_VERSION)</Version>
         <AssemblyName>Soenneker.Utils.FileSync</AssemblyName>
         <PackageId>Soenneker.Utils.FileSync</PackageId>
-        <PackageTags>file sync util c# .net dotnet</PackageTags>
+        <PackageTags>file sync util c# .net dotnet fileutilsync</PackageTags>
         <Copyright>Copyright © 2023 Jake Soenneker</Copyright>
         <Authors>Jake Soenneker</Authors>
         <Company>https://soenneker.com</Company>
@@ -36,11 +36,8 @@
         <None Include="..\README.md" Pack="true" PackagePath="\" />
         <None Include="..\LICENSE" Pack="true" PackagePath="\" />
         <None Include="..\icon.png" Pack="true" PackagePath="\" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
-
-        
-        <PackageReference Include="Soenneker.Extensions.FileInfo" Version="2.1.30" />
+        <PackageReference Include="Soenneker.Extensions.FileInfo" Version="2.1.31" />
         <PackageReference Include="Soenneker.Extensions.Stream" Version="2.1.10" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+        <PackageReference Include="Soenneker.Utils.Directory" Version="2.1.30" />
     </ItemGroup>
 </Project>
