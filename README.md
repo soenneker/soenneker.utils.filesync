@@ -8,5 +8,5 @@
 ## Installation
 
 ```
-Install-Package Soenneker.Utils.FileSync
+dotnet add package Soenneker.Utils.FileSync
 ```
