@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Soenneker.Extensions.FileInfo;
 using Soenneker.Extensions.Stream;
@@ -32,7 +33,7 @@ public class FileUtilSync : IFileUtilSync
     [Pure]
     public static string GetTempFileName()
     {
-        var result = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        string result = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         return result;
     }
 
@@ -114,6 +115,22 @@ public class FileUtilSync : IFileUtilSync
         File.Delete(filename);
     }
 
+    public void Delete(List<FileInfo> files, bool parallel = false)
+    {
+        if (!parallel)
+        {
+            for (var i = 0; i < files.Count; i++)
+            {
+                FileInfo file = files[i];
+                Delete(file.FullName);
+            }
+        }
+        else
+        {
+            Parallel.For(0, files.Count, i => { Delete(files[i].FullName); });
+        }
+    }
+
     public bool DeleteIfExists(string filename)
     {
         _logger.LogDebug("Deleting file if it exists: {filename} ...", filename);
@@ -144,8 +161,9 @@ public class FileUtilSync : IFileUtilSync
 
         List<FileInfo> files = GetAllFileInfoInDirectoryRecursivelySafe(directory);
 
-        foreach (FileInfo file in files)
+        for (var i = 0; i < files.Count; i++)
         {
+            FileInfo file = files[i];
             try
             {
                 file.RemoveReadOnlyOrArchivedAttribute();
@@ -181,8 +199,9 @@ public class FileUtilSync : IFileUtilSync
 
         List<FileInfo> files = GetAllFileInfoInDirectoryRecursivelySafe(directory);
 
-        foreach (FileInfo file in files)
+        for (var i = 0; i < files.Count; i++)
         {
+            FileInfo file = files[i];
             TryDelete(file.FullName);
         }
 
@@ -195,8 +214,9 @@ public class FileUtilSync : IFileUtilSync
 
         List<FileInfo> files = GetAllFileInfoInDirectoryRecursivelySafe(directory);
 
-        foreach (FileInfo file in files)
+        for (var i = 0; i < files.Count; i++)
         {
+            FileInfo file = files[i];
             Delete(file.FullName);
         }
 
@@ -264,16 +284,19 @@ public class FileUtilSync : IFileUtilSync
     {
         // Copy the directory structure
         string[] allDirectories = System.IO.Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories);
-        foreach (string dir in allDirectories)
+
+        for (var i = 0; i < allDirectories.Length; i++)
         {
+            string dir = allDirectories[i];
             string dirToCreate = dir.Replace(sourceDir, destinationDir);
             System.IO.Directory.CreateDirectory(dirToCreate);
         }
 
-        List<string> allFiles = GetAllFileNamesInDirectoryRecursively(sourceDir);
+        string[] allFiles = GetAllFileNamesInDirectoryRecursively(sourceDir);
 
-        foreach (string newPath in allFiles)
+        for (var i = 0; i < allFiles.Length; i++)
         {
+            string newPath = allFiles[i];
             File.Copy(newPath, newPath.Replace(sourceDir, destinationDir), overwrite);
         }
     }
@@ -287,8 +310,9 @@ public class FileUtilSync : IFileUtilSync
 
         string[] files = System.IO.Directory.GetFiles(sourceDirectory);
 
-        foreach (string filePath in files)
+        for (var i = 0; i < files.Length; i++)
         {
+            string filePath = files[i];
             string fileName = Path.GetFileName(filePath);
 
             string destinationPath = Path.Combine(destinationDirectory, fileName);
@@ -303,11 +327,11 @@ public class FileUtilSync : IFileUtilSync
         return new FileInfo(path).Length;
     }
 
-    public List<string> GetAllFileNamesInDirectoryRecursively(string directory)
+    public string[] GetAllFileNamesInDirectoryRecursively(string directory)
     {
         _logger.LogDebug("Getting all files from directory ({directory}) recursively...", directory);
 
-        List<string> result = System.IO.Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories).ToList();
+        string[] result = System.IO.Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories);
 
         return result;
     }
@@ -380,10 +404,12 @@ public class FileUtilSync : IFileUtilSync
 
     public void RenameAllFilesInDirectoryRecursively(string sourceDirectory, string oldValue, string newValue)
     {
-        List<string> allFiles = GetAllFileNamesInDirectoryRecursively(sourceDirectory);
+        string[] allFiles = GetAllFileNamesInDirectoryRecursively(sourceDirectory);
 
-        foreach (string file in allFiles)
+        for (var i = 0; i < allFiles.Length; i++)
         {
+            string file = allFiles[i];
+
             string newFileName = file.Replace(oldValue, newValue);
             Move(file, newFileName);
         }
