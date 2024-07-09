@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Soenneker.Utils.FileSync.Te
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{4CFBB91E-6C95-466F-A574-D7625AF4AA28}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\automerge.yml = .github\workflows\automerge.yml
+
 		.github\workflows\build-and-test.yml = .github\workflows\build-and-test.yml
 		.github\workflows\publish-package.yml = .github\workflows\publish-package.yml
 
