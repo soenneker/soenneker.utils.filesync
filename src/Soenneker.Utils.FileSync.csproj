@@ -36,7 +36,7 @@
         <None Include="..\README.md" Pack="true" PackagePath="\" />
         <None Include="..\LICENSE" Pack="true" PackagePath="\" />
         <None Include="..\icon.png" Pack="true" PackagePath="\" />
-        <PackageReference Include="Soenneker.Extensions.FileInfo" Version="2.1.360" />
+        <PackageReference Include="Soenneker.Extensions.FileInfo" Version="2.1.361" />
         <PackageReference Include="Soenneker.Extensions.Stream" Version="2.1.42" />
         <PackageReference Include="Soenneker.Utils.Directory" Version="2.1.366" />
     </ItemGroup>
