@@ -14,7 +14,7 @@
         <AssemblyName>Soenneker.Utils.FileSync</AssemblyName>
         <PackageId>Soenneker.Utils.FileSync</PackageId>
         <PackageTags>file sync util c# .net dotnet fileutilsync</PackageTags>
-        <Copyright>Copyright © 2023-2024 Jake Soenneker</Copyright>
+        <Copyright>Copyright © 2023-2025 Jake Soenneker</Copyright>
         <Authors>Jake Soenneker</Authors>
         <Company>https://soenneker.com</Company>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
