@@ -16,7 +16,7 @@ public interface IFileUtilSync
     /// <param name="path">The path of the file to read.</param>
     /// <returns>The content of the file as a string.</returns>
     [Pure]
-    string ReadFile(string path);
+    string Read(string path);
 
     /// <summary>
     /// Reads the content of a file and returns it as a byte array.
@@ -24,7 +24,7 @@ public interface IFileUtilSync
     /// <param name="path">The path of the file to read.</param>
     /// <returns>The content of the file as a byte array.</returns>
     [Pure]
-    byte[] ReadFileToBytes(string path);
+    byte[] ReadToBytes(string path);
 
     /// <summary>
     /// Reads the content of a file and returns it as a list of lines.
@@ -32,14 +32,14 @@ public interface IFileUtilSync
     /// <param name="path">The path of the file to read.</param>
     /// <returns>A list of strings, each representing a line in the file.</returns>
     [Pure]
-    List<string> ReadFileAsLines(string path);
+    List<string> ReadAsLines(string path);
 
     /// <summary>
     /// Writes the specified content to a file.
     /// </summary>
     /// <param name="fullName">The full path of the file to write to.</param>
     /// <param name="content">The content to write to the file.</param>
-    void WriteFile(string fullName, string content);
+    void Write(string fullName, string content);
 
     /// <summary>
     /// Writes a collection of strings to a file, each string as a new line.
@@ -53,14 +53,14 @@ public interface IFileUtilSync
     /// </summary>
     /// <param name="path">The path of the file to write to.</param>
     /// <param name="stream">The stream whose content is to be written to the file.</param>
-    void WriteFile(string path, Stream stream);
+    void Write(string path, Stream stream);
 
     /// <summary>
     /// Writes a byte array to a file.
     /// </summary>
     /// <param name="path">The path of the file to write to.</param>
     /// <param name="byteArray">The byte array to write to the file.</param>
-    void WriteFile(string path, byte[] byteArray);
+    void Write(string path, byte[] byteArray);
 
     /// <summary>
     /// Checks if a file exists at the specified path.
@@ -124,7 +124,7 @@ public interface IFileUtilSync
     /// <param name="sourceDirectory">The path of the directory to copy files from.</param>
     /// <param name="destinationDirectory">The path of the directory to copy files to.</param>
     /// <param name="overwrite">If true, overwrites existing files in the destination directory.</param>
-    void CopyFiles(string sourceDirectory, string destinationDirectory, bool overwrite = true);
+    void CopyDirectory(string sourceDirectory, string destinationDirectory, bool overwrite = true);
 
     /// <summary>
     /// Tries to copy a file from the source path to the target path, catching any exceptions.
@@ -148,7 +148,7 @@ public interface IFileUtilSync
     /// <param name="sourceDirectory">The path of the directory containing the files to rename.</param>
     /// <param name="oldValue">The value to replace in the file names.</param>
     /// <param name="newValue">The new value to insert in the file names.</param>
-    void RenameAllFilesInDirectoryRecursively(string sourceDirectory, string oldValue, string newValue);
+    void RenameAllInDirectoryRecursively(string sourceDirectory, string oldValue, string newValue);
 
     /// <summary>
     /// Gets all file information objects in the specified directory and its subdirectories, handling any exceptions.
@@ -162,13 +162,13 @@ public interface IFileUtilSync
     /// Tries to delete all files in the specified directory, handling any exceptions.
     /// </summary>
     /// <param name="directory">The path of the directory whose files are to be deleted.</param>
-    void TryDeleteAllFiles(string directory);
+    void TryDeleteAll(string directory);
 
     /// <summary>
     /// Deletes all files in the specified directory.
     /// </summary>
     /// <param name="directory">The path of the directory whose files are to be deleted.</param>
-    void DeleteAllFiles(string directory);
+    void DeleteAll(string directory);
 
     /// <summary>
     /// Copies all files from the source directory to the destination directory, including subdirectories.
@@ -176,7 +176,7 @@ public interface IFileUtilSync
     /// <param name="sourceDir">The path of the source directory.</param>
     /// <param name="destinationDir">The path of the destination directory.</param>
     /// <param name="overwrite">If true, overwrites existing files in the destination directory.</param>
-    void CopyFilesRecursively(string sourceDir, string destinationDir, bool overwrite = true);
+    void CopyRecursively(string sourceDir, string destinationDir, bool overwrite = true);
 
     /// <summary>
     /// Tries to remove the read-only and archive attributes from a file.
@@ -189,5 +189,5 @@ public interface IFileUtilSync
     /// Tries to remove the read-only and archive attributes from all files in the specified directory.
     /// </summary>
     /// <param name="directory">The path of the directory containing the files whose attributes are to be modified.</param>
-    void TryRemoveReadonlyAndArchiveAttributesFromAllFiles(string directory);
+    void TryRemoveReadonlyAndArchiveAttributesFromAll(string directory);
 }

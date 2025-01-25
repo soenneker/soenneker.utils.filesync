@@ -33,34 +33,28 @@ public class FileUtilSync : IFileUtilSync
     [Pure]
     public static string GetTempFileName()
     {
-        string result = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        return result;
+        return Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
     }
 
-    public string ReadFile(string path)
+    public string Read(string path)
     {
         _logger.LogDebug("{name} start for {path} ...", nameof(File.ReadAllText), path);
 
-        string result = File.ReadAllText(path);
-        return result;
+        return File.ReadAllText(path);
     }
 
-    public byte[] ReadFileToBytes(string path)
+    public byte[] ReadToBytes(string path)
     {
         _logger.LogDebug("{name} start for {path} ...", nameof(File.ReadAllBytes), path);
 
-        byte[] result = File.ReadAllBytes(path);
-
-        return result;
+        return File.ReadAllBytes(path);
     }
 
-    public List<string> ReadFileAsLines(string path)
+    public List<string> ReadAsLines(string path)
     {
         _logger.LogDebug("{name} start for {name} ...", nameof(File.ReadAllLines), path);
 
-        List<string> content = File.ReadAllLines(path).ToList();
-
-        return content;
+        return File.ReadAllLines(path).ToList();
     }
 
     public void WriteAllLines(string path, IEnumerable<string> lines)
@@ -70,14 +64,14 @@ public class FileUtilSync : IFileUtilSync
         File.WriteAllLines(path, lines);
     }
 
-    public void WriteFile(string path, string content)
+    public void Write(string path, string content)
     {
         _logger.LogDebug("{name} start for {name} ...", nameof(File.WriteAllText), path);
 
         File.WriteAllText(path, content);
     }
 
-    public void WriteFile(string path, Stream stream)
+    public void Write(string path, Stream stream)
     {
         stream.ToStart();
 
@@ -87,7 +81,7 @@ public class FileUtilSync : IFileUtilSync
         }
     }
 
-    public void WriteFile(string path, byte[] byteArray)
+    public void Write(string path, byte[] byteArray)
     {
         _logger.LogDebug("{name} start for {name} ...", nameof(File.WriteAllBytes), path);
 
@@ -155,7 +149,7 @@ public class FileUtilSync : IFileUtilSync
         return true;
     }
 
-    public void TryRemoveReadonlyAndArchiveAttributesFromAllFiles(string directory)
+    public void TryRemoveReadonlyAndArchiveAttributesFromAll(string directory)
     {
         _logger.LogInformation("Trying to remove readonly/archive in {dir} ...", directory);
 
@@ -193,7 +187,7 @@ public class FileUtilSync : IFileUtilSync
         return false;
     }
 
-    public void TryDeleteAllFiles(string directory)
+    public void TryDeleteAll(string directory)
     {
         _logger.LogInformation("Deleting all files in {dir} ...", directory);
 
@@ -208,7 +202,7 @@ public class FileUtilSync : IFileUtilSync
         _logger.LogTrace("Completed deleting all files");
     }
 
-    public void DeleteAllFiles(string directory)
+    public void DeleteAll(string directory)
     {
         _logger.LogInformation("Deleting all files in {directory} ...", directory);
 
@@ -280,7 +274,7 @@ public class FileUtilSync : IFileUtilSync
         }
     }
 
-    public void CopyFilesRecursively(string sourceDir, string destinationDir, bool overwrite = true)
+    public void CopyRecursively(string sourceDir, string destinationDir, bool overwrite = true)
     {
         // Copy the directory structure
         string[] allDirectories = System.IO.Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories);
@@ -301,7 +295,7 @@ public class FileUtilSync : IFileUtilSync
         }
     }
 
-    public void CopyFiles(string sourceDirectory, string destinationDirectory, bool overwrite = true)
+    public void CopyDirectory(string sourceDirectory, string destinationDirectory, bool overwrite = true)
     {
         if (!System.IO.Directory.Exists(sourceDirectory))
             throw new Exception($"Source directory ({sourceDirectory}) does not exist");
@@ -322,7 +316,7 @@ public class FileUtilSync : IFileUtilSync
     }
 
     [Pure]
-    public static long GetFileSize(string path)
+    public static long GetSize(string path)
     {
         return new FileInfo(path).Length;
     }
@@ -331,9 +325,7 @@ public class FileUtilSync : IFileUtilSync
     {
         _logger.LogDebug("Getting all files from directory ({directory}) recursively...", directory);
 
-        string[] result = System.IO.Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories);
-
-        return result;
+        return System.IO.Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories);
     }
 
     public List<FileInfo> GetAllFileInfoInDirectoryRecursivelySafe(string directory)
@@ -402,7 +394,7 @@ public class FileUtilSync : IFileUtilSync
         return list;
     }
 
-    public void RenameAllFilesInDirectoryRecursively(string sourceDirectory, string oldValue, string newValue)
+    public void RenameAllInDirectoryRecursively(string sourceDirectory, string oldValue, string newValue)
     {
         string[] allFiles = GetAllFileNamesInDirectoryRecursively(sourceDirectory);
 
