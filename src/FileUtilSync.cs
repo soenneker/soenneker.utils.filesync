@@ -81,14 +81,15 @@ public class FileUtilSync : IFileUtilSync
 
     public void Delete(string filename, bool log = true)
     {
-        _logger.LogDebug("Deleting {filename} ...", filename);
+        if (log)
+            _logger.LogDebug("Deleting {filename} ...", filename);
         File.Delete(filename);
     }
 
     public void Delete(List<FileInfo> files, bool parallel = false, bool log = true)
     {
         if (parallel)
-            System.Threading.Tasks.Parallel.For(0, files.Count, i => Delete(files[i].FullName, log));
+            Parallel.For(0, files.Count, i => Delete(files[i].FullName, log));
         else
             foreach (FileInfo file in files)
                 Delete(file.FullName, log);
