@@ -24,140 +24,97 @@ public class FileUtilSync : IFileUtilSync
         _directoryUtil = directoryUtil;
     }
 
-    /// <summary>
-    /// Use this instead of Systems.IO.Path.GetTempFileName()!  <para/>
-    /// 1. It creates 0 byte file (so it'll already exist)  <para/>
-    /// 2. It's slow because it iterates over the file system to (hopefully) find a non-collision <para/>
-    /// https://stackoverflow.com/a/50413126
-    /// </summary>
     [Pure]
-    public static string GetTempFileName()
-    {
-        return Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-    }
+    public static string GetTempFileName() => Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
-    public string Read(string path)
+    public string Read(string path, bool log = true)
     {
-        _logger.LogDebug("{name} start for {path} ...", nameof(File.ReadAllText), path);
-
+        if (log) _logger.LogDebug("{name} start for {path} ...", nameof(File.ReadAllText), path);
         return File.ReadAllText(path);
     }
 
-    public byte[] ReadToBytes(string path)
+    public byte[] ReadToBytes(string path, bool log = true)
     {
-        _logger.LogDebug("{name} start for {path} ...", nameof(File.ReadAllBytes), path);
-
+        if (log) _logger.LogDebug("{name} start for {path} ...", nameof(File.ReadAllBytes), path);
         return File.ReadAllBytes(path);
     }
 
-    public List<string> ReadAsLines(string path)
+    public List<string> ReadAsLines(string path, bool log = true)
     {
-        _logger.LogDebug("{name} start for {name} ...", nameof(File.ReadAllLines), path);
-
+        if (log) _logger.LogDebug("{name} start for {path} ...", nameof(File.ReadAllLines), path);
         return File.ReadAllLines(path).ToList();
     }
 
-    public void WriteAllLines(string path, IEnumerable<string> lines)
+    public void WriteAllLines(string path, IEnumerable<string> lines, bool log = true)
     {
-        _logger.LogDebug("{name} start for {path} ...", nameof(File.WriteAllLines), path);
-
+        if (log) _logger.LogDebug("{name} start for {path} ...", nameof(File.WriteAllLines), path);
         File.WriteAllLines(path, lines);
     }
 
-    public void Write(string path, string content)
+    public void Write(string path, string content, bool log = true)
     {
-        _logger.LogDebug("{name} start for {name} ...", nameof(File.WriteAllText), path);
-
+        if (log) _logger.LogDebug("{name} start for {path} ...", nameof(File.WriteAllText), path);
         File.WriteAllText(path, content);
     }
 
-    public void Write(string path, Stream stream)
+    public void Write(string path, Stream stream, bool log = true)
     {
+        if (log) _logger.LogDebug("Writing stream to {path} ...", path);
         stream.ToStart();
-
-        using (var fs = new FileStream(path, FileMode.OpenOrCreate))
-        {
-            stream.CopyTo(fs);
-        }
+        using var fs = new FileStream(path, FileMode.OpenOrCreate);
+        stream.CopyTo(fs);
     }
 
-    public void Write(string path, byte[] byteArray)
+    public void Write(string path, byte[] byteArray, bool log = true)
     {
-        _logger.LogDebug("{name} start for {name} ...", nameof(File.WriteAllBytes), path);
-
+        if (log) _logger.LogDebug("{name} start for {path} ...", nameof(File.WriteAllBytes), path);
         File.WriteAllBytes(path, byteArray);
     }
 
-    public bool Exists(string filename)
+    public bool Exists(string filename, bool log = true)
     {
-        _logger.LogDebug("Checking if file exists: {filename} ...", filename);
-
-        if (!File.Exists(filename))
-        {
-            _logger.LogDebug("{filename} does not exist", filename);
-            return false;
-        }
-
-        _logger.LogDebug("File exists: {filename}", filename);
-
-        return true;
+        if (log) _logger.LogDebug("Checking if file exists: {filename} ...", filename);
+        bool exists = File.Exists(filename);
+        if (log) _logger.LogDebug(exists ? "File exists: {filename}" : "{filename} does not exist", filename);
+        return exists;
     }
 
-    public void Delete(string filename)
+    public void Delete(string filename, bool log = true)
     {
         _logger.LogDebug("Deleting {filename} ...", filename);
         File.Delete(filename);
     }
 
-    public void Delete(List<FileInfo> files, bool parallel = false)
+    public void Delete(List<FileInfo> files, bool parallel = false, bool log = true)
     {
-        if (!parallel)
-        {
-            for (var i = 0; i < files.Count; i++)
-            {
-                FileInfo file = files[i];
-                Delete(file.FullName);
-            }
-        }
+        if (parallel)
+            System.Threading.Tasks.Parallel.For(0, files.Count, i => Delete(files[i].FullName, log));
         else
-        {
-            Parallel.For(0, files.Count, i => { Delete(files[i].FullName); });
-        }
+            foreach (FileInfo file in files)
+                Delete(file.FullName, log);
     }
 
-    public bool DeleteIfExists(string filename)
+    public bool DeleteIfExists(string filename, bool log = true)
     {
-        _logger.LogDebug("Deleting file if it exists: {filename} ...", filename);
-
-        if (!Exists(filename))
-            return false;
-
-        Delete(filename);
-
+        if (log) _logger.LogDebug("Deleting file if it exists: {filename} ...", filename);
+        if (!Exists(filename, log)) return false;
+        Delete(filename, log);
         return true;
     }
 
-    public bool TryDeleteIfExists(string filename)
+    public bool TryDeleteIfExists(string filename, bool log = true)
     {
-        _logger.LogDebug("Trying to delete file if it exists: {filename} ...", filename);
-
-        if (!Exists(filename))
-            return false;
-
-        TryDelete(filename);
-
-        return true;
+        if (log) _logger.LogDebug("Trying to delete file if it exists: {filename} ...", filename);
+        if (!Exists(filename, log)) return false;
+        return TryDelete(filename, log);
     }
 
-    public void TryRemoveReadonlyAndArchiveAttributesFromAll(string directory)
+    public void TryRemoveReadonlyAndArchiveAttributesFromAll(string directory, bool log = true)
     {
-        _logger.LogInformation("Trying to remove readonly/archive in {dir} ...", directory);
-
-        List<FileInfo> files = GetAllFileInfoInDirectoryRecursivelySafe(directory);
-
-        for (var i = 0; i < files.Count; i++)
+        if (log) _logger.LogInformation("Trying to remove readonly/archive in {dir} ...", directory);
+        List<FileInfo> files = GetAllFileInfoInDirectoryRecursivelySafe(directory, log);
+        foreach (FileInfo file in files)
         {
-            FileInfo file = files[i];
             try
             {
                 file.RemoveReadOnlyOrArchivedAttribute();
@@ -168,59 +125,44 @@ public class FileUtilSync : IFileUtilSync
             }
         }
 
-        _logger.LogTrace("Completed trying to remove readonly and archive from all files");
+        if (log) _logger.LogTrace("Completed trying to remove readonly and archive from all files");
     }
 
-    public bool TryRemoveReadonlyAndArchiveAttribute(string fileName)
+    public bool TryRemoveReadonlyAndArchiveAttribute(string fileName, bool log = true)
     {
         try
         {
-            var fileInfo = new FileInfo(fileName);
-            fileInfo.RemoveReadOnlyOrArchivedAttribute();
+            new FileInfo(fileName).RemoveReadOnlyOrArchivedAttribute();
             return true;
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Could not remove attributes from file ({file}), skipping", fileName);
+            return false;
         }
-
-        return false;
     }
 
-    public void TryDeleteAll(string directory)
+    public void TryDeleteAll(string directory, bool log = true)
     {
-        _logger.LogInformation("Deleting all files in {dir} ...", directory);
-
-        List<FileInfo> files = GetAllFileInfoInDirectoryRecursivelySafe(directory);
-
-        for (var i = 0; i < files.Count; i++)
-        {
-            FileInfo file = files[i];
-            TryDelete(file.FullName);
-        }
-
-        _logger.LogTrace("Completed deleting all files");
+        if (log) _logger.LogInformation("Deleting all files in {dir} ...", directory);
+        List<FileInfo> files = GetAllFileInfoInDirectoryRecursivelySafe(directory, log);
+        foreach (FileInfo file in files)
+            TryDelete(file.FullName, log);
+        if (log) _logger.LogTrace("Completed deleting all files");
     }
 
-    public void DeleteAll(string directory)
+    public void DeleteAll(string directory, bool log = true)
     {
-        _logger.LogInformation("Deleting all files in {directory} ...", directory);
-
-        List<FileInfo> files = GetAllFileInfoInDirectoryRecursivelySafe(directory);
-
-        for (var i = 0; i < files.Count; i++)
-        {
-            FileInfo file = files[i];
-            Delete(file.FullName);
-        }
-
-        _logger.LogDebug("Completed deleting all files from {directory}", directory);
+        if (log) _logger.LogInformation("Deleting all files in {directory} ...", directory);
+        List<FileInfo> files = GetAllFileInfoInDirectoryRecursivelySafe(directory, log);
+        foreach (FileInfo file in files)
+            Delete(file.FullName, log);
+        if (log) _logger.LogDebug("Completed deleting all files from {directory}", directory);
     }
 
-    public bool TryDelete(string filename)
+    public bool TryDelete(string filename, bool log = true)
     {
-        _logger.LogDebug("Trying to delete {filename} ...", filename);
-
+        if (log) _logger.LogDebug("Trying to delete {filename} ...", filename);
         try
         {
             File.Delete(filename);
@@ -233,38 +175,33 @@ public class FileUtilSync : IFileUtilSync
         }
     }
 
-    public void Move(string source, string target)
+    public void Move(string source, string target, bool log = true)
     {
         if (source == target)
         {
-            _logger.LogWarning("Not moving file ({source}) because source = target", source);
+            if (log) _logger.LogWarning("Not moving file ({source}) because source = target", source);
             return;
         }
 
-        _logger.LogDebug("Moving {source} to {target} ...", source, target);
-
+        if (log) _logger.LogDebug("Moving {source} to {target} ...", source, target);
         File.Move(source, target);
-
-        _logger.LogDebug("Finished moving {source} to {target}", source, target);
+        if (log) _logger.LogDebug("Finished moving {source} to {target}", source, target);
     }
 
-    public void Copy(string source, string target)
+    public void Copy(string source, string target, bool log = true)
     {
-        _logger.LogDebug("Copying {source} to {target} ...", source, target);
-
+        if (log) _logger.LogDebug("Copying {source} to {target} ...", source, target);
         File.Copy(source, target);
-
-        _logger.LogDebug("Finished copying {source} to {target}", source, target);
+        if (log) _logger.LogDebug("Finished copying {source} to {target}", source, target);
     }
 
-    public bool TryCopy(string source, string target)
+    public bool TryCopy(string source, string target, bool log = true)
     {
-        _logger.LogDebug("Trying to copy {source} to {target} ...", source, target);
-
+        if (log) _logger.LogDebug("Trying to copy {source} to {target} ...", source, target);
         try
         {
             File.Copy(source, target);
-            _logger.LogDebug("Finished copying {source} to {target}", source, target);
+            if (log) _logger.LogDebug("Finished copying {source} to {target}", source, target);
             return true;
         }
         catch (Exception e)
@@ -274,77 +211,58 @@ public class FileUtilSync : IFileUtilSync
         }
     }
 
-    public void CopyRecursively(string sourceDir, string destinationDir, bool overwrite = true)
+    public void CopyRecursively(string sourceDir, string destinationDir, bool overwrite = true, bool log = true)
     {
-        // Copy the directory structure
+        if (log) _logger.LogDebug("Copying directory {sourceDir} to {destinationDir}...", sourceDir, destinationDir);
         string[] allDirectories = System.IO.Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories);
-
-        for (var i = 0; i < allDirectories.Length; i++)
+        foreach (string dir in allDirectories)
         {
-            string dir = allDirectories[i];
             string dirToCreate = dir.Replace(sourceDir, destinationDir);
             System.IO.Directory.CreateDirectory(dirToCreate);
         }
 
-        string[] allFiles = GetAllFileNamesInDirectoryRecursively(sourceDir);
-
-        for (var i = 0; i < allFiles.Length; i++)
+        string[] allFiles = GetAllFileNamesInDirectoryRecursively(sourceDir, log);
+        foreach (string newPath in allFiles)
         {
-            string newPath = allFiles[i];
-            File.Copy(newPath, newPath.Replace(sourceDir, destinationDir), overwrite);
+            string destPath = newPath.Replace(sourceDir, destinationDir);
+            File.Copy(newPath, destPath, overwrite);
         }
     }
 
-    public void CopyDirectory(string sourceDirectory, string destinationDirectory, bool overwrite = true)
+    public void CopyDirectory(string sourceDirectory, string destinationDirectory, bool overwrite = true, bool log = true)
     {
-        if (!System.IO.Directory.Exists(sourceDirectory))
-            throw new Exception($"Source directory ({sourceDirectory}) does not exist");
-
-        _ = _directoryUtil.CreateIfDoesNotExist(destinationDirectory);
-
+        if (!System.IO.Directory.Exists(sourceDirectory)) throw new Exception($"Source directory ({sourceDirectory}) does not exist");
+        if (log) _ = _directoryUtil.CreateIfDoesNotExist(destinationDirectory);
         string[] files = System.IO.Directory.GetFiles(sourceDirectory);
-
-        for (var i = 0; i < files.Length; i++)
+        foreach (string filePath in files)
         {
-            string filePath = files[i];
             string fileName = Path.GetFileName(filePath);
-
             string destinationPath = Path.Combine(destinationDirectory, fileName);
-
             File.Copy(filePath, destinationPath, overwrite);
         }
     }
 
     [Pure]
-    public static long GetSize(string path)
-    {
-        return new FileInfo(path).Length;
-    }
+    public static long GetSize(string path) => new FileInfo(path).Length;
 
-    public string[] GetAllFileNamesInDirectoryRecursively(string directory)
+    public string[] GetAllFileNamesInDirectoryRecursively(string directory, bool log = true)
     {
-        _logger.LogDebug("Getting all files from directory ({directory}) recursively...", directory);
-
+        if (log) _logger.LogDebug("Getting all files from directory ({directory}) recursively...", directory);
         return System.IO.Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories);
     }
 
-    public List<FileInfo> GetAllFileInfoInDirectoryRecursivelySafe(string directory)
+    public List<FileInfo> GetAllFileInfoInDirectoryRecursivelySafe(string directory, bool log = true)
     {
-        _logger.LogDebug("Getting all FileInfos in {directory} recursively...", directory);
-
+        if (log) _logger.LogDebug("Getting all FileInfos in {directory} recursively...", directory);
         var list = new List<FileInfo>();
-
         try
         {
             var diTop = new DirectoryInfo(directory);
-
-            // Get all files in top level
             foreach (FileInfo fi in diTop.EnumerateFiles())
             {
                 try
                 {
-                    var fileInfo = new FileInfo(fi.FullName);
-                    list.Add(fileInfo);
+                    list.Add(new FileInfo(fi.FullName));
                 }
                 catch (UnauthorizedAccessException)
                 {
@@ -352,17 +270,15 @@ public class FileUtilSync : IFileUtilSync
                 }
             }
 
-            // Get each subdirectory, and then enumerate over those
-            foreach (DirectoryInfo? di in diTop.EnumerateDirectories("*"))
+            foreach (DirectoryInfo di in diTop.EnumerateDirectories("*"))
             {
                 try
                 {
-                    foreach (FileInfo? fi in di.EnumerateFiles("*", SearchOption.AllDirectories))
+                    foreach (FileInfo fi in di.EnumerateFiles("*", SearchOption.AllDirectories))
                     {
                         try
                         {
-                            var fileInfo = new FileInfo(fi.FullName);
-                            list.Add(fileInfo);
+                            list.Add(new FileInfo(fi.FullName));
                         }
                         catch (UnauthorizedAccessException)
                         {
@@ -376,34 +292,22 @@ public class FileUtilSync : IFileUtilSync
                 }
             }
         }
-        catch (DirectoryNotFoundException dirNotFound)
+        catch (Exception e) when (e is DirectoryNotFoundException || e is UnauthorizedAccessException || e is PathTooLongException)
         {
-            _logger.LogWarning("DirectoryNotFoundException {message}", dirNotFound.Message);
-        }
-        catch (UnauthorizedAccessException unAuthDir)
-        {
-            _logger.LogWarning("UnauthorizedAccessException: {message}", unAuthDir.Message);
-        }
-        catch (PathTooLongException longPath)
-        {
-            _logger.LogWarning("PathTooLongException {message}", longPath.Message);
+            _logger.LogWarning(e, e.Message);
         }
 
-        _logger.LogDebug("Completed getting all files in {dir}, number: {number}", directory, list.Count);
-
+        if (log) _logger.LogDebug("Completed getting all files in {directory}, number: {number}", directory, list.Count);
         return list;
     }
 
-    public void RenameAllInDirectoryRecursively(string sourceDirectory, string oldValue, string newValue)
+    public void RenameAllInDirectoryRecursively(string sourceDirectory, string oldValue, string newValue, bool log = true)
     {
-        string[] allFiles = GetAllFileNamesInDirectoryRecursively(sourceDirectory);
-
-        for (var i = 0; i < allFiles.Length; i++)
+        string[] allFiles = GetAllFileNamesInDirectoryRecursively(sourceDirectory, log);
+        foreach (string file in allFiles)
         {
-            string file = allFiles[i];
-
             string newFileName = file.Replace(oldValue, newValue);
-            Move(file, newFileName);
+            Move(file, newFileName, log);
         }
     }
 }

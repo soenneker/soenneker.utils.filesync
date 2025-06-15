@@ -1,193 +1,225 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.IO;
 
 namespace Soenneker.Utils.FileSync.Abstract;
 
 /// <summary>
-/// A utility library encapsulating synchronous file IO operations <para/>
-/// Typically, you'll want to use <code>Soenneker.Utils.File</code> for reading/writing (which is async)
+/// Provides synchronous file operations with optional logging.
 /// </summary>
 public interface IFileUtilSync
 {
     /// <summary>
-    /// Reads the content of a file and returns it as a string.
+    /// Reads all text from the specified file.
     /// </summary>
-    /// <param name="path">The path of the file to read.</param>
-    /// <returns>The content of the file as a string.</returns>
-    [Pure]
-    string Read(string path);
+    /// <param name="path">The file path to read from.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    /// <returns>The file contents as a string.</returns>
+    /// <exception cref="FileNotFoundException">Thrown if the file does not exist.</exception>
+    /// <exception cref="IOException">Thrown on I/O error.</exception>
+    /// <exception cref="UnauthorizedAccessException">Thrown if access is denied.</exception>
+    string Read(string path, bool log = true);
 
     /// <summary>
-    /// Reads the content of a file and returns it as a byte array.
+    /// Reads all bytes from the specified file.
     /// </summary>
-    /// <param name="path">The path of the file to read.</param>
-    /// <returns>The content of the file as a byte array.</returns>
-    [Pure]
-    byte[] ReadToBytes(string path);
+    /// <param name="path">The file path to read from.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    /// <returns>The file contents as a byte array.</returns>
+    /// <exception cref="FileNotFoundException" />
+    /// <exception cref="IOException" />
+    /// <exception cref="UnauthorizedAccessException" />
+    byte[] ReadToBytes(string path, bool log = true);
 
     /// <summary>
-    /// Reads the content of a file and returns it as a list of lines.
+    /// Reads all lines from the specified file.
     /// </summary>
-    /// <param name="path">The path of the file to read.</param>
-    /// <returns>A list of strings, each representing a line in the file.</returns>
-    [Pure]
-    List<string> ReadAsLines(string path);
+    /// <param name="path">The file path to read from.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    /// <returns>A list of lines from the file.</returns>
+    /// <exception cref="FileNotFoundException" />
+    /// <exception cref="IOException" />
+    /// <exception cref="UnauthorizedAccessException" />
+    List<string> ReadAsLines(string path, bool log = true);
 
     /// <summary>
-    /// Writes the specified content to a file.
+    /// Writes the specified lines to a file.
     /// </summary>
-    /// <param name="fullName">The full path of the file to write to.</param>
-    /// <param name="content">The content to write to the file.</param>
-    void Write(string fullName, string content);
+    /// <param name="path">The file path to write to.</param>
+    /// <param name="lines">The lines to write.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    /// <exception cref="IOException" />
+    /// <exception cref="UnauthorizedAccessException" />
+    void WriteAllLines(string path, IEnumerable<string> lines, bool log = true);
 
     /// <summary>
-    /// Writes a collection of strings to a file, each string as a new line.
+    /// Writes text content to a file.
     /// </summary>
-    /// <param name="path">The path of the file to write to.</param>
-    /// <param name="content">The collection of strings to write to the file.</param>
-    void WriteAllLines(string path, IEnumerable<string> content);
+    /// <param name="path">The file path to write to.</param>
+    /// <param name="content">The text content to write.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    /// <exception cref="IOException" />
+    /// <exception cref="UnauthorizedAccessException" />
+    void Write(string path, string content, bool log = true);
 
     /// <summary>
-    /// Writes the content of a stream to a file. Seeks to the start before writing and closes the file after writing. Does NOT close the stream after writing.
+    /// Writes a stream to a file.
     /// </summary>
-    /// <param name="path">The path of the file to write to.</param>
-    /// <param name="stream">The stream whose content is to be written to the file.</param>
-    void Write(string path, Stream stream);
+    /// <param name="path">The file path to write to.</param>
+    /// <param name="stream">The stream to write.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    void Write(string path, Stream stream, bool log = true);
 
     /// <summary>
     /// Writes a byte array to a file.
     /// </summary>
-    /// <param name="path">The path of the file to write to.</param>
-    /// <param name="byteArray">The byte array to write to the file.</param>
-    void Write(string path, byte[] byteArray);
+    /// <param name="path">The file path to write to.</param>
+    /// <param name="byteArray">The data to write.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    void Write(string path, byte[] byteArray, bool log = true);
 
     /// <summary>
-    /// Checks if a file exists at the specified path.
+    /// Determines whether the specified file exists.
     /// </summary>
-    /// <param name="filename">The path of the file to check.</param>
+    /// <param name="filename">The file path to check.</param>
+    /// <param name="log">Whether to log the check.</param>
     /// <returns>True if the file exists; otherwise, false.</returns>
-    [Pure]
-    bool Exists(string filename);
+    bool Exists(string filename, bool log = true);
 
     /// <summary>
     /// Deletes the specified file.
     /// </summary>
-    /// <param name="filename">The path of the file to delete.</param>
-    void Delete(string filename);
+    /// <param name="filename">The file path to delete.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    void Delete(string filename, bool log = true);
 
     /// <summary>
-    /// Deletes a list of files. Optionally performs deletions in parallel.
+    /// Deletes multiple files.
     /// </summary>
-    /// <param name="files">The list of files to delete.</param>
-    /// <param name="parallel">If true, deletes files in parallel.</param>
-    void Delete(List<FileInfo> files, bool parallel = false);
+    /// <param name="files">The list of file infos to delete.</param>
+    /// <param name="parallel">Whether to delete in parallel.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    void Delete(List<FileInfo> files, bool parallel = false, bool log = true);
 
     /// <summary>
-    /// Deletes the specified file if it exists.
+    /// Deletes the file if it exists.
     /// </summary>
-    /// <param name="filename">The path of the file to delete if it exists.</param>
+    /// <param name="filename">The file path to delete.</param>
+    /// <param name="log">Whether to log the operation.</param>
     /// <returns>True if the file was deleted; otherwise, false.</returns>
-    bool DeleteIfExists(string filename);
+    bool DeleteIfExists(string filename, bool log = true);
 
     /// <summary>
-    /// Tries to delete the specified file if it exists, catching any exceptions.
+    /// Tries to delete the file if it exists, catching any exceptions.
     /// </summary>
-    /// <param name="filename">The path of the file to delete if it exists.</param>
-    /// <returns>True if the file was successfully deleted; otherwise, false.</returns>
-    bool TryDeleteIfExists(string filename);
+    /// <param name="filename">The file path to delete.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    /// <returns>True if the file was deleted; otherwise, false.</returns>
+    bool TryDeleteIfExists(string filename, bool log = true);
 
     /// <summary>
-    /// Tries to delete the specified file, catching any exceptions.
+    /// Removes read-only and archive attributes from all files in a directory.
     /// </summary>
-    /// <param name="filename">The path of the file to delete.</param>
-    /// <returns>True if the file was successfully deleted; otherwise, false.</returns>
-    bool TryDelete(string filename);
+    /// <param name="directory">The directory path.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    void TryRemoveReadonlyAndArchiveAttributesFromAll(string directory, bool log = true);
 
     /// <summary>
-    /// Moves a file from the source path to the target path.
+    /// Removes read-only and archive attributes from a single file.
     /// </summary>
-    /// <param name="source">The path of the file to move.</param>
-    /// <param name="target">The path to move the file to.</param>
-    void Move(string source, string target);
+    /// <param name="fileName">The file path.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    /// <returns>True if attributes were removed; otherwise, false.</returns>
+    bool TryRemoveReadonlyAndArchiveAttribute(string fileName, bool log = true);
 
     /// <summary>
-    /// Copies a file from the source path to the target path.
+    /// Attempts to delete all files in a directory, catching exceptions.
     /// </summary>
-    /// <param name="source">The path of the file to copy.</param>
-    /// <param name="target">The path to copy the file to.</param>
-    void Copy(string source, string target);
+    /// <param name="directory">The directory path.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    void TryDeleteAll(string directory, bool log = true);
 
     /// <summary>
-    /// Copies all files from the source directory to the destination directory.
+    /// Deletes all files in a directory.
     /// </summary>
-    /// <param name="sourceDirectory">The path of the directory to copy files from.</param>
-    /// <param name="destinationDirectory">The path of the directory to copy files to.</param>
-    /// <param name="overwrite">If true, overwrites existing files in the destination directory.</param>
-    void CopyDirectory(string sourceDirectory, string destinationDirectory, bool overwrite = true);
+    /// <param name="directory">The directory path.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    void DeleteAll(string directory, bool log = true);
 
     /// <summary>
-    /// Tries to copy a file from the source path to the target path, catching any exceptions.
+    /// Tries to delete a file, catching and logging any exceptions.
     /// </summary>
-    /// <param name="source">The path of the file to copy.</param>
-    /// <param name="target">The path to copy the file to.</param>
-    /// <returns>True if the file was successfully copied; otherwise, false.</returns>
-    bool TryCopy(string source, string target);
+    /// <param name="filename">The file path to delete.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    /// <returns>True if the file was deleted; otherwise, false.</returns>
+    bool TryDelete(string filename, bool log = true);
 
     /// <summary>
-    /// Gets all file names in the specified directory and its subdirectories.
+    /// Moves a file from source to target.
     /// </summary>
-    /// <param name="directory">The path of the directory to search.</param>
-    /// <returns>A list of all file names in the directory and its subdirectories.</returns>
-    [Pure]
-    string[] GetAllFileNamesInDirectoryRecursively(string directory);
+    /// <param name="source">The source file path.</param>
+    /// <param name="target">The target file path.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    void Move(string source, string target, bool log = true);
 
     /// <summary>
-    /// Renames all files in the specified directory and its subdirectories by replacing an old value with a new value in the file names.
+    /// Copies a file from source to target.
     /// </summary>
-    /// <param name="sourceDirectory">The path of the directory containing the files to rename.</param>
-    /// <param name="oldValue">The value to replace in the file names.</param>
-    /// <param name="newValue">The new value to insert in the file names.</param>
-    void RenameAllInDirectoryRecursively(string sourceDirectory, string oldValue, string newValue);
+    /// <param name="source">The source file path.</param>
+    /// <param name="target">The target file path.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    void Copy(string source, string target, bool log = true);
 
     /// <summary>
-    /// Gets all file information objects in the specified directory and its subdirectories, handling any exceptions.
+    /// Tries to copy a file, catching and logging any exceptions.
     /// </summary>
-    /// <param name="directory">The path of the directory to search.</param>
-    /// <returns>A list of file information objects for all files in the directory and its subdirectories.</returns>
-    [Pure]
-    List<FileInfo> GetAllFileInfoInDirectoryRecursivelySafe(string directory);
+    /// <param name="source">The source file path.</param>
+    /// <param name="target">The target file path.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    /// <returns>True if the file was copied; otherwise, false.</returns>
+    bool TryCopy(string source, string target, bool log = true);
 
     /// <summary>
-    /// Tries to delete all files in the specified directory, handling any exceptions.
+    /// Recursively copies a directory.
     /// </summary>
-    /// <param name="directory">The path of the directory whose files are to be deleted.</param>
-    void TryDeleteAll(string directory);
+    /// <param name="sourceDir">The source directory.</param>
+    /// <param name="destinationDir">The destination directory.</param>
+    /// <param name="overwrite">Whether to overwrite existing files.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    void CopyRecursively(string sourceDir, string destinationDir, bool overwrite = true, bool log = true);
 
     /// <summary>
-    /// Deletes all files in the specified directory.
+    /// Copies files in a single directory.
     /// </summary>
-    /// <param name="directory">The path of the directory whose files are to be deleted.</param>
-    void DeleteAll(string directory);
+    /// <param name="sourceDirectory">The source directory.</param>
+    /// <param name="destinationDirectory">The destination directory.</param>
+    /// <param name="overwrite">Whether to overwrite existing files.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    void CopyDirectory(string sourceDirectory, string destinationDirectory, bool overwrite = true, bool log = true);
 
     /// <summary>
-    /// Copies all files from the source directory to the destination directory, including subdirectories.
+    /// Gets all file names in a directory recursively.
     /// </summary>
-    /// <param name="sourceDir">The path of the source directory.</param>
-    /// <param name="destinationDir">The path of the destination directory.</param>
-    /// <param name="overwrite">If true, overwrites existing files in the destination directory.</param>
-    void CopyRecursively(string sourceDir, string destinationDir, bool overwrite = true);
+    /// <param name="directory">The directory path.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    /// <returns>An array of file paths.</returns>
+    string[] GetAllFileNamesInDirectoryRecursively(string directory, bool log = true);
 
     /// <summary>
-    /// Tries to remove the read-only and archive attributes from a file.
+    /// Safely gets all FileInfo objects in a directory recursively.
     /// </summary>
-    /// <param name="fileName">The path of the file whose attributes are to be modified.</param>
-    /// <returns>True if the attributes were successfully removed; otherwise, false.</returns>
-    bool TryRemoveReadonlyAndArchiveAttribute(string fileName);
+    /// <param name="directory">The directory path.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    /// <returns>A list of FileInfo objects.</returns>
+    List<FileInfo> GetAllFileInfoInDirectoryRecursivelySafe(string directory, bool log = true);
 
     /// <summary>
-    /// Tries to remove the read-only and archive attributes from all files in the specified directory.
+    /// Renames all matching occurrences in file paths recursively.
     /// </summary>
-    /// <param name="directory">The path of the directory containing the files whose attributes are to be modified.</param>
-    void TryRemoveReadonlyAndArchiveAttributesFromAll(string directory);
+    /// <param name="sourceDirectory">The directory to scan.</param>
+    /// <param name="oldValue">The substring to replace.</param>
+    /// <param name="newValue">The replacement substring.</param>
+    /// <param name="log">Whether to log the operation.</param>
+    void RenameAllInDirectoryRecursively(string sourceDirectory, string oldValue, string newValue, bool log = true);
 }
