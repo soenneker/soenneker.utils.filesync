@@ -25,7 +25,7 @@ public class FileUtilSync : IFileUtilSync
     }
 
     [Pure]
-    public static string GetTempFileName() => Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+    public static string GetTempFileName() => System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString());
 
     public string Read(string path, bool log = true)
     {
@@ -237,8 +237,8 @@ public class FileUtilSync : IFileUtilSync
         string[] files = System.IO.Directory.GetFiles(sourceDirectory);
         foreach (string filePath in files)
         {
-            string fileName = Path.GetFileName(filePath);
-            string destinationPath = Path.Combine(destinationDirectory, fileName);
+            string fileName = System.IO.Path.GetFileName(filePath);
+            string destinationPath = System.IO.Path.Combine(destinationDirectory, fileName);
             File.Copy(filePath, destinationPath, overwrite);
         }
     }
