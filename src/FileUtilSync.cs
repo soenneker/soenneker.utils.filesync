@@ -13,7 +13,7 @@ using Soenneker.Utils.FileSync.Abstract;
 namespace Soenneker.Utils.FileSync;
 
 ///<inheritdoc cref="IFileUtilSync"/>
-public class FileUtilSync : IFileUtilSync
+public sealed class FileUtilSync : IFileUtilSync
 {
     private readonly ILogger<FileUtilSync> _logger;
     private readonly IDirectoryUtil _directoryUtil;
