@@ -233,7 +233,7 @@ public sealed class FileUtilSync : IFileUtilSync
     public void CopyDirectory(string sourceDirectory, string destinationDirectory, bool overwrite = true, bool log = true)
     {
         if (!System.IO.Directory.Exists(sourceDirectory)) throw new Exception($"Source directory ({sourceDirectory}) does not exist");
-        if (log) _ = _directoryUtil.CreateIfDoesNotExist(destinationDirectory);
+        if (log) _ = _directoryUtil.Create(destinationDirectory);
         string[] files = System.IO.Directory.GetFiles(sourceDirectory);
         foreach (string filePath in files)
         {
