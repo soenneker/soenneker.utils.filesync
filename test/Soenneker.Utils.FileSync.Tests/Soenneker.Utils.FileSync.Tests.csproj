@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Soenneker.Utils.FileSync.csproj" />
+        <ProjectReference Include="..\..\src\Soenneker.Utils.FileSync\Soenneker.Utils.FileSync.csproj" />
     </ItemGroup>
 
     <ItemGroup>
