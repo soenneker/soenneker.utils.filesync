@@ -24,6 +24,10 @@ public sealed class FileUtilSync : IFileUtilSync
         _directoryUtil = directoryUtil;
     }
 
+    /// <summary>
+    /// Gets temp file name.
+    /// </summary>
+    /// <returns>The result of the operation.</returns>
     [Pure]
     public static string GetTempFileName() => System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString());
 
@@ -243,6 +247,11 @@ public sealed class FileUtilSync : IFileUtilSync
         }
     }
 
+    /// <summary>
+    /// Gets size.
+    /// </summary>
+    /// <param name="path">The path.</param>
+    /// <returns>The result of the operation.</returns>
     [Pure]
     public static long GetSize(string path) => new FileInfo(path).Length;
 
