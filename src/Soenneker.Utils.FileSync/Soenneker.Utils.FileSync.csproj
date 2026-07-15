@@ -41,6 +41,6 @@
         <None Include="..\..\icon.png" Pack="true" PackagePath="\" />
         <PackageReference Include="Soenneker.Extensions.FileInfo" Version="4.0.608" />
         <PackageReference Include="Soenneker.Extensions.Stream" Version="4.0.130" />
-        <PackageReference Include="Soenneker.Utils.Directory" Version="4.0.877" />
+        <PackageReference Include="Soenneker.Utils.Directory" Version="4.0.878" />
     </ItemGroup>
 </Project>
