@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Soenneker.Extensions.FileInfo;
@@ -46,7 +45,7 @@ public sealed class FileUtilSync : IFileUtilSync
     public List<string> ReadAsLines(string path, bool log = true)
     {
         if (log) _logger.LogDebug("{name} start for {path} ...", nameof(File.ReadAllLines), path);
-        return File.ReadAllLines(path).ToList();
+        return new List<string>(File.ReadLines(path));
     }
 
     public void WriteAllLines(string path, IEnumerable<string> lines, bool log = true)
@@ -65,7 +64,7 @@ public sealed class FileUtilSync : IFileUtilSync
     {
         if (log) _logger.LogDebug("Writing stream to {path} ...", path);
         stream.ToStart();
-        using var fs = new FileStream(path, FileMode.OpenOrCreate);
+        using var fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
         stream.CopyTo(fs);
     }
 
@@ -219,17 +218,15 @@ public sealed class FileUtilSync : IFileUtilSync
     public void CopyRecursively(string sourceDir, string destinationDir, bool overwrite = true, bool log = true)
     {
         if (log) _logger.LogDebug("Copying directory {sourceDir} to {destinationDir}...", sourceDir, destinationDir);
-        string[] allDirectories = System.IO.Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories);
-        foreach (string dir in allDirectories)
+        foreach (string dir in System.IO.Directory.EnumerateDirectories(sourceDir, "*", SearchOption.AllDirectories))
         {
-            string dirToCreate = dir.Replace(sourceDir, destinationDir);
+            string dirToCreate = System.IO.Path.Combine(destinationDir, System.IO.Path.GetRelativePath(sourceDir, dir));
             System.IO.Directory.CreateDirectory(dirToCreate);
         }
 
-        string[] allFiles = GetAllFileNamesInDirectoryRecursively(sourceDir, log);
-        foreach (string newPath in allFiles)
+        foreach (string newPath in System.IO.Directory.EnumerateFiles(sourceDir, "*", SearchOption.AllDirectories))
         {
-            string destPath = newPath.Replace(sourceDir, destinationDir);
+            string destPath = System.IO.Path.Combine(destinationDir, System.IO.Path.GetRelativePath(sourceDir, newPath));
             File.Copy(newPath, destPath, overwrite);
         }
     }
@@ -238,8 +235,7 @@ public sealed class FileUtilSync : IFileUtilSync
     {
         if (!System.IO.Directory.Exists(sourceDirectory)) throw new Exception($"Source directory ({sourceDirectory}) does not exist");
         if (log) _ = _directoryUtil.Create(destinationDirectory);
-        string[] files = System.IO.Directory.GetFiles(sourceDirectory);
-        foreach (string filePath in files)
+        foreach (string filePath in System.IO.Directory.EnumerateFiles(sourceDirectory))
         {
             string fileName = System.IO.Path.GetFileName(filePath);
             string destinationPath = System.IO.Path.Combine(destinationDirectory, fileName);
@@ -267,40 +263,16 @@ public sealed class FileUtilSync : IFileUtilSync
         var list = new List<FileInfo>();
         try
         {
-            var diTop = new DirectoryInfo(directory);
-            foreach (FileInfo fi in diTop.EnumerateFiles())
+            var options = new EnumerationOptions
             {
-                try
-                {
-                    list.Add(new FileInfo(fi.FullName));
-                }
-                catch (UnauthorizedAccessException)
-                {
-                    _logger.LogWarning("Unauthorized Exception for {fullName}", fi.FullName);
-                }
-            }
+                RecurseSubdirectories = true,
+                IgnoreInaccessible = true,
+                AttributesToSkip = FileAttributes.ReparsePoint
+            };
 
-            foreach (DirectoryInfo di in diTop.EnumerateDirectories("*"))
-            {
-                try
-                {
-                    foreach (FileInfo fi in di.EnumerateFiles("*", SearchOption.AllDirectories))
-                    {
-                        try
-                        {
-                            list.Add(new FileInfo(fi.FullName));
-                        }
-                        catch (UnauthorizedAccessException)
-                        {
-                            _logger.LogWarning("Unauthorized Exception for {fullName}", fi.FullName);
-                        }
-                    }
-                }
-                catch (UnauthorizedAccessException)
-                {
-                    _logger.LogWarning("Unauthorized Exception for {fullName}", di.FullName);
-                }
-            }
+            var top = new DirectoryInfo(directory);
+            foreach (FileInfo file in top.EnumerateFiles("*", options))
+                list.Add(file);
         }
         catch (Exception e) when (e is DirectoryNotFoundException || e is UnauthorizedAccessException || e is PathTooLongException)
         {
