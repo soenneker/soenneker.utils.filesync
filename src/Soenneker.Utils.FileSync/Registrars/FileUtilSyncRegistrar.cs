@@ -15,6 +15,7 @@ public static class FileUtilSyncRegistrar
     /// Shorthand for <code>services.AddScoped</code> <para/>
     /// Does NOT need to be registered if you're also using IFileUtil.
     /// </summary>
+    /// <returns>Adds <see cref="IFileUtilSync"/> as a scoped service. <para/> Shorthand for <code>services.AddScoped</code> <para/> Does NOT need to be registered if you're also using IFileUtil.</returns>
     public static IServiceCollection AddFileUtilSyncAsScoped(this IServiceCollection services)
     {
         services.AddDirectoryUtilAsScoped();
@@ -28,6 +29,7 @@ public static class FileUtilSyncRegistrar
     /// Shorthand for <code>services.AddSingleton</code> <para/>
     /// Does NOT need to be registered if you're also using IFileUtil.
     /// </summary>
+    /// <returns>Adds <see cref="IFileUtilSync"/> as a singleton service. <para/> Shorthand for <code>services.AddSingleton</code> <para/> Does NOT need to be registered if you're also using IFileUtil.</returns>
     public static IServiceCollection AddFileUtilSyncAsSingleton(this IServiceCollection services)
     {
         services.AddDirectoryUtilAsSingleton();

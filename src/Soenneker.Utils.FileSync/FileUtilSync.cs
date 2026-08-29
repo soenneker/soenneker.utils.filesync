@@ -24,9 +24,9 @@ public sealed class FileUtilSync : IFileUtilSync
     }
 
     /// <summary>
-    /// Gets temp file name.
+    /// Creates a uniquely named zero-byte temporary file and returns its full path.
     /// </summary>
-    /// <returns>The result of the operation.</returns>
+    /// <returns>The new temporary file's full path.</returns>
     [Pure]
     public static string GetTempFileName() => System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString());
 
@@ -244,10 +244,10 @@ public sealed class FileUtilSync : IFileUtilSync
     }
 
     /// <summary>
-    /// Gets size.
+    /// Returns a file's size, or the combined size of all files under a directory.
     /// </summary>
-    /// <param name="path">The path.</param>
-    /// <returns>The result of the operation.</returns>
+    /// <param name="path">The file or directory to measure.</param>
+    /// <returns>The size in bytes.</returns>
     [Pure]
     public static long GetSize(string path) => new FileInfo(path).Length;
 
