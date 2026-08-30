@@ -24,7 +24,7 @@ public sealed class FileUtilSync : IFileUtilSync
     }
 
     /// <summary>
-    /// Creates a uniquely named zero-byte temporary file and returns its full path.
+    /// Generates a unique path under the system temporary directory without creating the file.
     /// </summary>
     /// <returns>The new temporary file's full path.</returns>
     [Pure]
@@ -218,13 +218,22 @@ public sealed class FileUtilSync : IFileUtilSync
     public void CopyRecursively(string sourceDir, string destinationDir, bool overwrite = true, bool log = true)
     {
         if (log) _logger.LogDebug("Copying directory {sourceDir} to {destinationDir}...", sourceDir, destinationDir);
-        foreach (string dir in System.IO.Directory.EnumerateDirectories(sourceDir, "*", SearchOption.AllDirectories))
+        System.IO.Directory.CreateDirectory(destinationDir);
+
+        var options = new EnumerationOptions
+        {
+            RecurseSubdirectories = true,
+            IgnoreInaccessible = false,
+            AttributesToSkip = FileAttributes.ReparsePoint
+        };
+
+        foreach (string dir in System.IO.Directory.EnumerateDirectories(sourceDir, "*", options))
         {
             string dirToCreate = System.IO.Path.Combine(destinationDir, System.IO.Path.GetRelativePath(sourceDir, dir));
             System.IO.Directory.CreateDirectory(dirToCreate);
         }
 
-        foreach (string newPath in System.IO.Directory.EnumerateFiles(sourceDir, "*", SearchOption.AllDirectories))
+        foreach (string newPath in System.IO.Directory.EnumerateFiles(sourceDir, "*", options))
         {
             string destPath = System.IO.Path.Combine(destinationDir, System.IO.Path.GetRelativePath(sourceDir, newPath));
             File.Copy(newPath, destPath, overwrite);
@@ -234,7 +243,7 @@ public sealed class FileUtilSync : IFileUtilSync
     public void CopyDirectory(string sourceDirectory, string destinationDirectory, bool overwrite = true, bool log = true)
     {
         if (!System.IO.Directory.Exists(sourceDirectory)) throw new Exception($"Source directory ({sourceDirectory}) does not exist");
-        if (log) _ = _directoryUtil.Create(destinationDirectory);
+        System.IO.Directory.CreateDirectory(destinationDirectory);
         foreach (string filePath in System.IO.Directory.EnumerateFiles(sourceDirectory))
         {
             string fileName = System.IO.Path.GetFileName(filePath);
@@ -244,7 +253,7 @@ public sealed class FileUtilSync : IFileUtilSync
     }
 
     /// <summary>
-    /// Returns a file's size, or the combined size of all files under a directory.
+    /// Returns a file's size.
     /// </summary>
     /// <param name="path">The file or directory to measure.</param>
     /// <returns>The size in bytes.</returns>
@@ -254,7 +263,14 @@ public sealed class FileUtilSync : IFileUtilSync
     public string[] GetAllFileNamesInDirectoryRecursively(string directory, bool log = true)
     {
         if (log) _logger.LogDebug("Getting all files from directory ({directory}) recursively...", directory);
-        return System.IO.Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories);
+        var options = new EnumerationOptions
+        {
+            RecurseSubdirectories = true,
+            IgnoreInaccessible = false,
+            AttributesToSkip = FileAttributes.ReparsePoint
+        };
+
+        return [.. System.IO.Directory.EnumerateFiles(directory, "*", options)];
     }
 
     public List<FileInfo> GetAllFileInfoInDirectoryRecursivelySafe(string directory, bool log = true)
