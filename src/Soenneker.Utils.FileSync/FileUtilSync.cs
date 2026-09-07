@@ -32,37 +32,37 @@ public sealed class FileUtilSync : IFileUtilSync
 
     public string Read(string path, bool log = true)
     {
-        if (log) _logger.LogDebug("{name} start for {path} ...", nameof(File.ReadAllText), path);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("{name} start for {path} ...", nameof(File.ReadAllText), path);
         return File.ReadAllText(path);
     }
 
     public byte[] ReadToBytes(string path, bool log = true)
     {
-        if (log) _logger.LogDebug("{name} start for {path} ...", nameof(File.ReadAllBytes), path);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("{name} start for {path} ...", nameof(File.ReadAllBytes), path);
         return File.ReadAllBytes(path);
     }
 
     public List<string> ReadAsLines(string path, bool log = true)
     {
-        if (log) _logger.LogDebug("{name} start for {path} ...", nameof(File.ReadAllLines), path);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("{name} start for {path} ...", nameof(File.ReadAllLines), path);
         return new List<string>(File.ReadLines(path));
     }
 
     public void WriteAllLines(string path, IEnumerable<string> lines, bool log = true)
     {
-        if (log) _logger.LogDebug("{name} start for {path} ...", nameof(File.WriteAllLines), path);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("{name} start for {path} ...", nameof(File.WriteAllLines), path);
         File.WriteAllLines(path, lines);
     }
 
     public void Write(string path, string content, bool log = true)
     {
-        if (log) _logger.LogDebug("{name} start for {path} ...", nameof(File.WriteAllText), path);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("{name} start for {path} ...", nameof(File.WriteAllText), path);
         File.WriteAllText(path, content);
     }
 
     public void Write(string path, Stream stream, bool log = true)
     {
-        if (log) _logger.LogDebug("Writing stream to {path} ...", path);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("Writing stream to {path} ...", path);
         stream.ToStart();
         using var fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
         stream.CopyTo(fs);
@@ -70,21 +70,21 @@ public sealed class FileUtilSync : IFileUtilSync
 
     public void Write(string path, byte[] byteArray, bool log = true)
     {
-        if (log) _logger.LogDebug("{name} start for {path} ...", nameof(File.WriteAllBytes), path);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("{name} start for {path} ...", nameof(File.WriteAllBytes), path);
         File.WriteAllBytes(path, byteArray);
     }
 
     public bool Exists(string filename, bool log = true)
     {
-        if (log) _logger.LogDebug("Checking if file exists: {filename} ...", filename);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("Checking if file exists: {filename} ...", filename);
         bool exists = File.Exists(filename);
-        if (log) _logger.LogDebug(exists ? "File exists: {filename}" : "{filename} does not exist", filename);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug(exists ? "File exists: {filename}" : "{filename} does not exist", filename);
         return exists;
     }
 
     public void Delete(string filename, bool log = true)
     {
-        if (log)
+        if (log && _logger.IsEnabled(LogLevel.Debug))
             _logger.LogDebug("Deleting {filename} ...", filename);
         File.Delete(filename);
     }
@@ -100,7 +100,7 @@ public sealed class FileUtilSync : IFileUtilSync
 
     public bool DeleteIfExists(string filename, bool log = true)
     {
-        if (log) _logger.LogDebug("Deleting file if it exists: {filename} ...", filename);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("Deleting file if it exists: {filename} ...", filename);
         if (!Exists(filename, log)) return false;
         Delete(filename, log);
         return true;
@@ -108,7 +108,7 @@ public sealed class FileUtilSync : IFileUtilSync
 
     public bool TryDeleteIfExists(string filename, bool log = true)
     {
-        if (log) _logger.LogDebug("Trying to delete file if it exists: {filename} ...", filename);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("Trying to delete file if it exists: {filename} ...", filename);
         if (!Exists(filename, log)) return false;
         return TryDelete(filename, log);
     }
@@ -161,12 +161,12 @@ public sealed class FileUtilSync : IFileUtilSync
         List<FileInfo> files = GetAllFileInfoInDirectoryRecursivelySafe(directory, log);
         foreach (FileInfo file in files)
             Delete(file.FullName, log);
-        if (log) _logger.LogDebug("Completed deleting all files from {directory}", directory);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("Completed deleting all files from {directory}", directory);
     }
 
     public bool TryDelete(string filename, bool log = true)
     {
-        if (log) _logger.LogDebug("Trying to delete {filename} ...", filename);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("Trying to delete {filename} ...", filename);
         try
         {
             File.Delete(filename);
@@ -187,25 +187,25 @@ public sealed class FileUtilSync : IFileUtilSync
             return;
         }
 
-        if (log) _logger.LogDebug("Moving {source} to {target} ...", source, target);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("Moving {source} to {target} ...", source, target);
         File.Move(source, target);
-        if (log) _logger.LogDebug("Finished moving {source} to {target}", source, target);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("Finished moving {source} to {target}", source, target);
     }
 
     public void Copy(string source, string target, bool log = true)
     {
-        if (log) _logger.LogDebug("Copying {source} to {target} ...", source, target);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("Copying {source} to {target} ...", source, target);
         File.Copy(source, target);
-        if (log) _logger.LogDebug("Finished copying {source} to {target}", source, target);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("Finished copying {source} to {target}", source, target);
     }
 
     public bool TryCopy(string source, string target, bool log = true)
     {
-        if (log) _logger.LogDebug("Trying to copy {source} to {target} ...", source, target);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("Trying to copy {source} to {target} ...", source, target);
         try
         {
             File.Copy(source, target);
-            if (log) _logger.LogDebug("Finished copying {source} to {target}", source, target);
+            if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("Finished copying {source} to {target}", source, target);
             return true;
         }
         catch (Exception e)
@@ -217,7 +217,7 @@ public sealed class FileUtilSync : IFileUtilSync
 
     public void CopyRecursively(string sourceDir, string destinationDir, bool overwrite = true, bool log = true)
     {
-        if (log) _logger.LogDebug("Copying directory {sourceDir} to {destinationDir}...", sourceDir, destinationDir);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("Copying directory {sourceDir} to {destinationDir}...", sourceDir, destinationDir);
         System.IO.Directory.CreateDirectory(destinationDir);
 
         var options = new EnumerationOptions
@@ -262,7 +262,7 @@ public sealed class FileUtilSync : IFileUtilSync
 
     public string[] GetAllFileNamesInDirectoryRecursively(string directory, bool log = true)
     {
-        if (log) _logger.LogDebug("Getting all files from directory ({directory}) recursively...", directory);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("Getting all files from directory ({directory}) recursively...", directory);
         var options = new EnumerationOptions
         {
             RecurseSubdirectories = true,
@@ -275,7 +275,7 @@ public sealed class FileUtilSync : IFileUtilSync
 
     public List<FileInfo> GetAllFileInfoInDirectoryRecursivelySafe(string directory, bool log = true)
     {
-        if (log) _logger.LogDebug("Getting all FileInfos in {directory} recursively...", directory);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("Getting all FileInfos in {directory} recursively...", directory);
         var list = new List<FileInfo>();
         try
         {
@@ -295,7 +295,7 @@ public sealed class FileUtilSync : IFileUtilSync
             _logger.LogWarning(e, e.Message);
         }
 
-        if (log) _logger.LogDebug("Completed getting all files in {directory}, number: {number}", directory, list.Count);
+        if (log && _logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("Completed getting all files in {directory}, number: {number}", directory, list.Count);
         return list;
     }
 
